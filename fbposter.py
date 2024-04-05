@@ -1,7 +1,7 @@
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from tkinter import W, END, Button, Label, Text, Entry, Tk
+from tkinter import W, END, Button, Label, Text, Tk
 from tkinter import messagebox, filedialog
 import threading
 from selenium.webdriver.common.by import By
