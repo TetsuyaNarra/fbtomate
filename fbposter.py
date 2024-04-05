@@ -1,7 +1,8 @@
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from tkinter import W, END, Button, Label, Text, Tk
+from tkinter import W, END, Button, Label, PhotoImage, Text, Tk
+
 from tkinter import messagebox, filedialog
 import threading
 from selenium.webdriver.common.by import By
@@ -10,10 +11,16 @@ from selenium.common.exceptions import NoSuchElementException
 
 #Window properties
 main_window = Tk()
+
+#Title bar text
 main_window.title("FB Poster")
-main_window.iconbitmap("D:\Personal\Python\Fukemu updates\Icon\\fukemologo.ico")
+#Title bar icon
+main_window.iconbitmap("fbposter.ico")
+#main window size
 main_window.geometry("372x580+20+20")
+#main window background color
 main_window.configure(bg="#FFFFFF")
+#Disable maximized button
 main_window.resizable(0, 0)
 
 
@@ -58,7 +65,7 @@ def OpenChromeThread():
 
 #open chrome browser
 def OpenChrome():
-    # Store the ID of the original window
+    #Store the ID of the original window
     #global original_window
     #original_window = driver.current_window_handle
     try:
