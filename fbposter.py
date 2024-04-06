@@ -1,13 +1,11 @@
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from tkinter import W, END, Button, Label, PhotoImage, Text, Tk
-
+from tkinter import W, END, Button, Label, Text, Tk
 from tkinter import messagebox, filedialog
 import threading
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException 
-
 
 #Window properties
 main_window = Tk()
@@ -65,21 +63,20 @@ def OpenChromeThread():
 
 #open chrome browser
 def OpenChrome():
-    #Store the ID of the original window
-    #global original_window
-    #original_window = driver.current_window_handle
     try:
-        Browser_stop.configure(bg="#FFFFFF", fg="#212121", border=1, text="Stop", state="active", activebackground="#FFFFFF")
-        changeOnHoverBg(Browser_stop, "#dcdcde", "#FFFFFF")
+        #Webdriver variables
         Newoptions = webdriver.ChromeOptions()
         Newoptions.add_experimental_option("excludeSwitches", ['enable-automation'])
         Newoptions.add_argument("--disable-notifications")
         global driver
         driver = webdriver.Chrome(options=Newoptions)
+        Browser_stop.configure(bg="#FFFFFF", fg="#212121", border=1, text="Stop", state="active", activebackground="#FFFFFF")
+        changeOnHoverBg(Browser_stop, "#dcdcde", "#FFFFFF") 
         driver.maximize_window()
         driver.get('https://web.facebook.com/')
     except:
         Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
+
 
 
 #Manually stops chromedriver
@@ -99,7 +96,10 @@ def EndofSession():
         driver.quit()
         #driver.service.is_connectable()
         Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
+        group_txt_box.configure(state="normal", bg="#B0BEC5")
+        post_txt_box.configure(state="normal", bg="#B0BEC5")
         print("Session has ended successfuly")
+
 
 def checkElement():
     try:
@@ -196,25 +196,36 @@ def loop_thread():
                 print("Posted successfully")
                 messagebox.showinfo("DONE","%d/%d completed successfuly" % (i + 1, len(empty_list)))
                 EndofSession()
+
                 break
                 
                 
 
 def thread_main():
-    #check if all fields are empty or not
-    print("Session started...")
-    group = group_txt_box.get("1.0",'end-1c')
-    msg = post_txt_box.get("1.0", 'end-1c')
-    if group and msg:
-        group_txt_box.configure(state="disabled", bg="#eeeeee")
-        post_txt_box.configure(state="disabled", bg="#eeeeee")
-        #starting thread
-        global start_thread
-        start_thread = threading.Thread(target=loop_thread)
-        start_thread.start()
+    driver = webdriver.Chrome()
+    group_txt_box.configure(state="disabled", bg="#eeeeee")
+    post_txt_box.configure(state="disabled", bg="#eeeeee")
+    if driver.current_window_handle:
+        messagebox.showerror('ERROR', 'Please open Google chrome first and login.')
+        group_txt_box.configure(state="normal", bg="#B0BEC5")
+        post_txt_box.configure(state="normal", bg="#B0BEC5")
+        return 
     else:
-        #warning to fill all fields
-        messagebox.showerror("Error", "Please fill all fields!")
+        #check if all fields are empty or not
+        print("Session started...")
+        group = group_txt_box.get("1.0",'end-1c')
+        msg = post_txt_box.get("1.0", 'end-1c')
+        if group and msg:
+            group_txt_box.configure(state="disabled", bg="#eeeeee")
+            post_txt_box.configure(state="disabled", bg="#eeeeee")
+            #starting thread
+            global start_thread
+            start_thread = threading.Thread(target=loop_thread)
+            start_thread.start()
+        else:
+            #warning to fill all fields
+            messagebox.showerror("Error", "Please fill all fields!")
+    
 
     
 
