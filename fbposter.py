@@ -1,3 +1,4 @@
+import time
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
@@ -47,7 +48,7 @@ def clear():
     group = group_txt_box.get("1.0",'end-1c')
     msg = post_txt_box.get("1.0", 'end-1c')
 
-    if group and msg:
+    if group or msg:
         group_txt_box.delete('1.0', END)
         post_txt_box.delete('1.0', END)
         status.configure(text="Fields has been cleared successfully!", fg='green')
@@ -93,9 +94,9 @@ def chromeStop():
         messagebox.showerror("Error", "There's no session yet.")
         
 def EndofSession():
-        driver.quit()
+        #driver.quit()
         #driver.service.is_connectable()
-        Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
+        #Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
         group_txt_box.configure(state="normal", bg="#B0BEC5")
         post_txt_box.configure(state="normal", bg="#B0BEC5")
         print("Session has ended successfuly")
@@ -119,6 +120,7 @@ def checkElement():
         except NoSuchElementException:
             print("element not found") 
             print("Moving to next ID...")
+            
 
 def changeOnHoverBg(button, colorOnHover, colorOnLeave):
 
@@ -167,7 +169,9 @@ def loop_thread():
                 #click to write
                 Write.click()
                 print("Writing...")
+                driver.implicitly_wait(3)
                 pyautogui.typewrite(post_txt_box.get("1.0", END))
+                driver.implicitly_wait(3)
                 print("Post writing was completed")
                 main_window.update()
                 driver.implicitly_wait(3)
@@ -178,7 +182,7 @@ def loop_thread():
                 main_window.update()
                 status.configure(text="%d/%d completed" % (i + 1, len(empty_list)))
                 #driver.implicitly_wait(2)
-                driver.implicitly_wait(5)
+                time.sleep(5)
                 # remove in pro version
                 i += 1
                 driver.implicitly_wait(10)
@@ -194,37 +198,36 @@ def loop_thread():
             except Exception:
                 i -= 1
                 print("Posted successfully")
-                messagebox.showinfo("DONE","%d/%d completed successfuly" % (i + 1, len(empty_list)))
+                messagebox.showinfo("Done","%d/%d completed successfuly" % (i + 1, len(empty_list)))
                 EndofSession()
-
                 break
                 
                 
 
 def thread_main():
-    driver = webdriver.Chrome()
-    group_txt_box.configure(state="disabled", bg="#eeeeee")
-    post_txt_box.configure(state="disabled", bg="#eeeeee")
-    if driver.current_window_handle:
-        messagebox.showerror('ERROR', 'Please open Google chrome first and login.')
-        group_txt_box.configure(state="normal", bg="#B0BEC5")
-        post_txt_box.configure(state="normal", bg="#B0BEC5")
-        return 
-    else:
-        #check if all fields are empty or not
-        print("Session started...")
-        group = group_txt_box.get("1.0",'end-1c')
-        msg = post_txt_box.get("1.0", 'end-1c')
-        if group and msg:
-            group_txt_box.configure(state="disabled", bg="#eeeeee")
-            post_txt_box.configure(state="disabled", bg="#eeeeee")
-            #starting thread
-            global start_thread
-            start_thread = threading.Thread(target=loop_thread)
-            start_thread.start()
-        else:
-            #warning to fill all fields
-            messagebox.showerror("Error", "Please fill all fields!")
+    try:
+        driver._check_if_window_handle_is_current
+        try:
+            #check if all fields are empty or not
+            print("Session started...")
+            group = group_txt_box.get("1.0",'end-1c')
+            msg = post_txt_box.get("1.0", 'end-1c')
+            if group and msg:
+                print(driver.service.is_connectable())
+                group_txt_box.configure(state="disabled", bg="#eeeeee")
+                post_txt_box.configure(state="disabled", bg="#eeeeee")
+                #starting thread
+                global start_thread
+                start_thread = threading.Thread(target=loop_thread)
+                start_thread.start()
+            else:
+                #warning to fill all fields
+                messagebox.showerror("Error", "Please fill all fields!")
+        except:
+            print("Unable to start session. Please start Google Chrome and login before starting session.")
+    except:
+        messagebox.showerror("Error", "Please start Google Chrome and login before starting session.")
+
     
 
     
@@ -263,8 +266,8 @@ post_txt_box = Text(main_window, height=10, width=26)
 post_txt_box.configure(border="1", bg="#B0BEC5")
 post_txt_box.grid(row=6, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
 
-status = Label(main_window, fg="#B0BEC5", bg="#FFFFFF", font="montserrat 10 bold")
-status.grid(row=11, column=0, columnspan=2, ipadx=100, ipady=0)
+status = Label(main_window, fg="green", bg="#FFFFFF", font="montserrat 10 bold", text="")
+status.grid(row=11, column=0, columnspan=2, ipadx=0, ipady=0, padx=5, pady=2, sticky=W)
 
 send_btn = Button(main_window, text="START", bg="#FFFFFF", fg="#212121", font="Montserrat 10 ", activebackground="white", command=thread_main)
 send_btn.configure(border="1")
