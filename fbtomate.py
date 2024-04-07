@@ -12,9 +12,9 @@ from selenium.common.exceptions import NoSuchElementException
 main_window = Tk()
 
 #Title bar text
-main_window.title("FB Poster")
+main_window.title("FBtomate")
 #Title bar icon
-main_window.iconbitmap("fbposter.ico")
+main_window.iconbitmap("fbtomate.ico")
 #main window size
 main_window.geometry("372x580+20+20")
 #main window background color
