@@ -196,11 +196,20 @@ def loop_thread():
                     pass
                     """
             except Exception:
-                i -= 1
-                print("Posted successfully")
-                messagebox.showinfo("Done","%d/%d completed successfuly" % (i + 1, len(empty_list)))
-                EndofSession()
-                break
+                try:
+                    print("post unsuccessful in " + (empty_list[i]))
+                    main_window.update()
+                    status.configure(text="%d/%d completed" % (i - 1, len(empty_list)))
+                    #driver.implicitly_wait(2)
+                    time.sleep(5)
+                # remove in pro version
+                    i += 1
+                except Exception:
+                    i -= 1
+                    print("Posted successfully")
+                    messagebox.showinfo("Done","%d/%d completed successfuly" % (i - 1, len(empty_list)))
+                    EndofSession()
+                    break
                 
                 
 
