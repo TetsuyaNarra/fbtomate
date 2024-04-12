@@ -14,7 +14,7 @@ main_window = Tk()
 #Title bar text
 main_window.title("FBtomate")
 #Title bar icon
-main_window.iconbitmap("fbtomate.ico")
+main_window.iconbitmap("Logo_FBtomate.ico")
 #main window size
 main_window.geometry("372x580+20+20")
 #main window background color
@@ -29,15 +29,18 @@ def donothing():
 
 #group id list
 def open_ids():
-    ids_text_file = filedialog.askopenfilename(initialdir="C:/Desktop/", title='', filetypes=(("Text Files", "*.txt"),))
-    text_file = open(ids_text_file, 'r')
-    text_inside = text_file.read()
-    if text_inside != '':
-        group_txt_box.delete('1.0', END)
-        group_txt_box.insert(END, text_inside)
-        text_file.close()
-    else:
-        messagebox.showwarning("Warning",FileNotFoundError)
+    try:
+        ids_text_file = filedialog.askopenfilename(initialdir="C:/Desktop/", title='', filetypes=(("Text Files", "*.txt"),))
+        text_file = open(ids_text_file, 'r')
+        text_inside = text_file.read()
+        if text_inside != '':
+            group_txt_box.delete('1.0', END)
+            group_txt_box.insert(END, text_inside)
+            text_file.close()
+        else:
+            statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
+    except FileNotFoundError:
+        statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
 
 #update status back to normal
 def clearStatus():
@@ -51,10 +54,10 @@ def clear():
     if group or msg:
         group_txt_box.delete('1.0', END)
         post_txt_box.delete('1.0', END)
-        status.configure(text="Fields has been cleared successfully!", fg='green')
-        status.after(3000, clearStatus)
+        statusUpdate("Fields has been cleared successfully!", "green", 3000, "Montserrat 10")
     else:
-        messagebox.showerror("Error", "No text inputs found!")
+        statusUpdate("No text inputs found!", "red", 3000, "Montserrat 10")
+        
     
 #Start thread for opening chrome
 def OpenChromeThread():
@@ -83,7 +86,7 @@ def OpenChrome():
 #Manually stops chromedriver
 def chromeStop():
     try:
-        messagebox.showinfo("Processing", "Please wait while we are terminating session.")
+        statusUpdate("Please wait while we are terminating session.", "yellow", 3000, "Montserrat 10")
         driver.quit()
         #driver.service.is_connectable()
         print("Process terminated successfuly")
@@ -91,12 +94,9 @@ def chromeStop():
         group_txt_box.configure(state="normal", bg="#B0BEC5")
         post_txt_box.configure(state="normal", bg="#B0BEC5")
     except:
-        messagebox.showerror("Error", "There's no session yet.")
+        statusUpdate("There's no session yet!", "red", 3000, "Montserrat 10")
         
 def EndofSession():
-        #driver.quit()
-        #driver.service.is_connectable()
-        #Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
         group_txt_box.configure(state="normal", bg="#B0BEC5")
         post_txt_box.configure(state="normal", bg="#B0BEC5")
         print("Session has ended successfuly")
@@ -147,7 +147,6 @@ def changeOnHoverFg(button, colorOnHover, colorOnLeave):
 def loop_thread():
     empty_list = []
     from_group_id = group_txt_box.get("1.0", END)
-    print()
     empty_list = from_group_id.split(",")
     done = empty_list[-1]
     done = done[1:-1]
@@ -181,23 +180,15 @@ def loop_thread():
                 print("post was done in " + (empty_list[i]))
                 main_window.update()
                 status.configure(text="%d/%d completed" % (i + 1, len(empty_list)))
-                #driver.implicitly_wait(2)
                 time.sleep(5)
-                # remove in pro version
+
                 i += 1
                 driver.implicitly_wait(10)
                 print("Moving to new ID")
-                """
-                if i == 5:
-                    messagebox.showinfo("Trial limit reached", "Only Five(5) groups allowed in trial")
-                    time.sleep(1)
-                    shutdown()
-                else:
-                    pass
-                    """
+
             except Exception:
                 try:
-                    print("post unsuccessful in " + (empty_list[i]))
+                    print("Post unsuccessful in " + (empty_list[i]))
                     main_window.update()
                     status.configure(text="%d/%d completed" % (i - 1, len(empty_list)))
                     #driver.implicitly_wait(2)
@@ -206,19 +197,28 @@ def loop_thread():
                     i += 1
                 except Exception:
                     i -= 1
-                    print("Posted successfully")
-                    messagebox.showinfo("Done","%d/%d completed successfuly" % (i - 1, len(empty_list)))
+                    messagebox.showinfo("DONE","%d/%d completed successfuly" % (i - 1, len(empty_list)))
+                    status.configure(text="%d/%d completed successfuly" % (i - 1, len(empty_list)))
                     EndofSession()
                     break
                 
-                
-
+def checkDriverIfRunning():
+    try:
+        while driver._check_if_window_handle_is_current:
+            try:
+                statusUpdate("Driver is running...","green", 5000, "montserrat 10")
+            except:
+                Browser_stop.config(state="disabled")
+                break
+    except: 
+        print("Driver is not running...")
+        
 def thread_main():
     try:
         driver._check_if_window_handle_is_current
         try:
             #check if all fields are empty or not
-            print("Session started...")
+            statusUpdate("Session started...", "green", 1000, "Montserrat 10")
             group = group_txt_box.get("1.0",'end-1c')
             msg = post_txt_box.get("1.0", 'end-1c')
             if group and msg:
@@ -231,16 +231,23 @@ def thread_main():
                 start_thread.start()
             else:
                 #warning to fill all fields
-                messagebox.showerror("Error", "Please fill all fields!")
+                statusUpdate("Please fill all fields!", "red", 3000, "Montserrat 10")
         except:
-            print("Unable to start session. Please start Google Chrome and login before starting session.")
+            statusUpdate("Unable to start session. Please start Google Chrome and login before starting session.", "red", 3000, "Montserrat 8")
     except:
-        messagebox.showerror("Error", "Please start Google Chrome and login before starting session.")
+        statusUpdate("Please start Google Chrome and login before starting session.", "red", 3000, "Montserrat 8")
 
     
+def statusUpdate(displayText, foreground_color, duration, fontSize):
+    print(displayText)
+    status.configure(text=displayText, fg=foreground_color, font=fontSize)
+    status.after(duration, clearStatus)
 
-    
-
+def manualQuit():
+    try:
+        driver.quit()
+    except:
+        print("Exiting driver...")
 
 # space above
 login_counter = Label(main_window, text="Please login in: ()", font="Montserrat 10 bold", bg="#ffffff", fg="#ffffff")
@@ -293,7 +300,11 @@ changeOnHoverBg(read_txt, "#dcdcde", "#FFFFFF")
 changeOnHoverBg(clear_btn, "#dcdcde", "#FFFFFF")
 changeOnHoverBg(send_btn, "#dcdcde", "#FFFFFF")
 
+#checking if driver is running to disable stop button if false
+#checkDriverIfRunning()
 
 main_window.mainloop()
-driver.quit()
-print("driver has been ended")
+#Exits driver if any and catch driver not define if not
+manualQuit()
+#Info about program/driver status ended
+print("Driver has been ended")
