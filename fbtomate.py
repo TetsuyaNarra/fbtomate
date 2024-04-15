@@ -1,3 +1,4 @@
+from PIL import ImageTk
 import time
 import pyautogui
 from selenium.webdriver.common.keys import Keys
@@ -14,9 +15,11 @@ main_window = Tk()
 #Title bar text
 main_window.title("FBtomate")
 #Title bar icon
-main_window.iconbitmap("Logo_FBtomate.ico")
+img = ImageTk.PhotoImage(file='logo-removebg.png')
+main_window.iconphoto(True, img)
+#main_window.iconbitmap("Logo_FBtomate.ico")
 #main window size
-main_window.geometry("372x580+20+20")
+main_window.geometry("372x580+20+20")#372x580
 #main window background color
 main_window.configure(bg="#FFFFFF")
 #Disable maximized button
@@ -61,6 +64,7 @@ def clear():
     
 #Start thread for opening chrome
 def OpenChromeThread():
+    statusUpdate("Opening chrome...", "green", 5000, "Montserrat 10")
     global chromeThread
     chromeThread = threading.Thread(target=OpenChrome, args=())
     chromeThread.start()
@@ -293,6 +297,12 @@ clear_btn = Button(main_window, text="CLEAR", bg="#FFFFFF", fg="#212121", font="
                    activebackground="white", command=clear)
 clear_btn.configure(border="1")
 clear_btn.grid(row=10, column=1, columnspan=1, ipadx=70, ipady=0, padx=5, pady=5, sticky=W)
+
+#terminal view option
+'''
+terminalView = Text(main_window, height=300, width=372)
+terminalView.grid(row=12, column=0, columnspan=3, sticky=W)
+'''
 
 #Change button background color on hover
 changeOnHoverBg(Browser_open, "#dcdcde", "#FFFFFF")
