@@ -135,6 +135,7 @@ class fbToMate():
 
             
         def loop_thread():
+            minOnStart()
             empty_list = []
             from_group_id = group_txt_box.get("1.0", END)
             empty_list = from_group_id.split(",")
@@ -171,19 +172,26 @@ class fbToMate():
                         self.main_window.update()
                         status.configure(text="%d/%d completed" % (i + 1, len(empty_list)))
                         time.sleep(5)
-
                         i += 1
                         driver.implicitly_wait(10)
                         print("Moving to new ID")
+
+                        if i == 100:
+                            messagebox.showinfo("Trial limit reached", "Only Five(5) groups allowed in trial")
+                            EndofSession()
+                            manualQuit()
+                            Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
+                            changeOnHoverBg(Browser_stop, "#FFFFFF", "#FFFFFF") 
+                            break
 
                     except Exception:
                         try:
                             print("Post unsuccessful in " + (empty_list[i]))
                             self.main_window.update()
                             status.configure(text="%d/%d completed" % (i - 1, len(empty_list)))
-                            #driver.implicitly_wait(2)
+                            
                             time.sleep(5)
-                        # remove in pro version
+                        
                             i += 1
                         except Exception:
                             i -= 1
@@ -292,6 +300,9 @@ class fbToMate():
 
         #checking if driver is running to disable stop button if false
         #checkDriverIfRunning()
+
+def minOnStart():
+    main_window.iconify()
 
 def manualQuit():
     try:
