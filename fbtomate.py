@@ -3,7 +3,7 @@ import time
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from tkinter import W, END, Button, Label, Text, Tk
+from tkinter import W, END, Button, Label, Menu, Text, Tk
 from tkinter import messagebox, filedialog
 import threading
 from selenium.webdriver.common.by import By
@@ -175,7 +175,7 @@ class fbToMate():
                         i += 1
                         driver.implicitly_wait(10)
                         print("Moving to new ID")
-
+                        '''
                         if i == 100:
                             messagebox.showinfo("Trial limit reached", "Only Five(5) groups allowed in trial")
                             EndofSession()
@@ -183,6 +183,7 @@ class fbToMate():
                             Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
                             changeOnHoverBg(Browser_stop, "#FFFFFF", "#FFFFFF") 
                             break
+                            '''
 
                     except Exception:
                         try:
@@ -240,6 +241,23 @@ class fbToMate():
             print(displayText)
             status.configure(text=displayText, fg=foreground_color, font=fontSize)
             status.after(duration, clearStatus)
+
+
+        # Creating Menubar 
+        menubar = Menu(self.main_window) 
+        
+        # Adding options menu
+        file = Menu(menubar, tearoff = 0) 
+        menubar.add_cascade(label ='Options', menu = file) 
+        file.add_command(label="Preferences", command=donothing)
+        file.add_command(label="Support", command=donothing)
+        file.add_command(label="Report issue", command=donothing)
+        file.add_command(label="Check for updates", command=donothing)
+        file.add_command(label="About", command=donothing)
+        
+
+
+        self.main_window.config(menu = menubar)
 
         # space above
         login_counter = Label(self.main_window, text="Please login in: ()", font="Montserrat 10 bold", bg="#ffffff", fg="#ffffff")
