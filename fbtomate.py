@@ -3,7 +3,7 @@ import time
 import pyautogui
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-from tkinter import W, END, Button, Label, Menu, Text, Tk
+from tkinter import E, W, END, Button, Label, Menu, Text, Tk, Toplevel, ttk
 from tkinter import messagebox, filedialog
 import threading
 from selenium.webdriver.common.by import By
@@ -12,10 +12,11 @@ from selenium.common.exceptions import NoSuchElementException
 class fbToMate():
     def __init__(self, main_window):
         self.main_window = main_window
+
         #Empty functions
         def donothing():
             pass
-
+        
         #group id list
         def open_ids():
             try:
@@ -78,6 +79,7 @@ class fbToMate():
             try:
                 statusUpdate("Please wait while we are terminating session.", "yellow", 3000, "Montserrat 10")
                 driver.quit()
+                
                 #driver.service.is_connectable()
                 print("Process terminated successfuly")
                 Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
@@ -151,6 +153,7 @@ class fbToMate():
                         driver.implicitly_wait(5)
                         #post find post element
                         checkElement()
+                        
                         driver.implicitly_wait(3)
                         #prints if createPost element clicked
                         print("Create post executed")
@@ -200,7 +203,8 @@ class fbToMate():
                             status.configure(text="%d/%d completed successfuly" % (i - 1, len(empty_list)))
                             EndofSession()
                             break
-                        
+
+
         def checkDriverIfRunning():
             try:
                 while driver._check_if_window_handle_is_current:
@@ -242,6 +246,52 @@ class fbToMate():
             status.configure(text=displayText, fg=foreground_color, font=fontSize)
             status.after(duration, clearStatus)
 
+        def optionsPage():                
+            settingsPage = Toplevel()
+            settingsPage.title("Settings")
+            #Title bar icon
+            img = ImageTk.PhotoImage(file='logo-removebg.png')
+            settingsPage.iconphoto(True, img)
+            #main window size
+            settingsPage.geometry("372x580+20+20")#372x580
+            #main window background color
+            settingsPage.configure(bg="#FFFFFF")
+            #Disable maximized button
+            settingsPage.resizable(0,0)
+
+
+
+            #Save Settings button
+            saveSettingsbtn = Button(settingsPage, text='Save', font="Montserrat 12", bg="#FDFDFD", fg="#212121", relief='raised', command=settingsPage.destroy)
+            saveSettingsbtn.configure()
+            saveSettingsbtn.grid(row=0, column=0, columnspan=1, padx=20, pady=20, sticky=W)
+
+            #Settings label 
+            settingsLabel = Label(settingsPage, text="Settings", font="Montserrat 16", bg="#FDFDFD", fg="#212121")
+            settingsLabel.grid(row=1, column=0, columnspan=1, ipadx=20, ipady=20, sticky=W)
+
+            #session option
+            sessionType = Label(settingsPage, text="Session type: ", font="Montserrat 12", bg="#FDFDFD", fg="#0a0a0a")
+            sessionType.grid(row=2, column=0, columnspan=2, ipadx=20, ipady=10, sticky=W)
+
+            #Values of session type
+            types = ['Import', 'Get from groups']
+
+            #Dowpdown for session type
+            sessionDrop = ttk.Combobox(settingsPage, width=30, values=types, state="readonly")
+            #choose the first option as default
+            sessionDrop.current(0)  
+            #display combobox
+            sessionDrop.grid(row=2, column=1, columnspan=2, padx=20, sticky=E)
+
+            #Checkbox label
+            checkboxLabel = Label(settingsPage, text="Show console: ", font="Montserrat 12", bg="#FDFDFD", fg="#0a0a0a")
+            checkboxLabel.grid(row=3, column=0, columnspan=2, ipadx=20, ipady=10, sticky=W)
+
+            #create checkbox
+            checkBox = ttk.Checkbutton(settingsPage, onvalue=donothing, offvalue=donothing)
+            checkBox.grid(row=3, column=1, columnspan=2, padx=20, sticky=W)
+
 
         # Creating Menubar 
         menubar = Menu(self.main_window) 
@@ -249,14 +299,13 @@ class fbToMate():
         # Adding options menu
         file = Menu(menubar, tearoff = 0) 
         menubar.add_cascade(label ='Options', menu = file) 
-        file.add_command(label="Preferences", command=donothing)
-        file.add_command(label="Support", command=donothing)
-        file.add_command(label="Report issue", command=donothing)
-        file.add_command(label="Check for updates", command=donothing)
-        file.add_command(label="About", command=donothing)
+        file.add_command(label="Preferences", command=optionsPage)
+        file.add_command(label="Support", command=donothing , state='disabled')
+        file.add_command(label="Report issue", command=donothing, state='disabled')
+        file.add_command(label="Check for updates", command=donothing, state='disabled')
+        file.add_command(label="About", command=donothing, state='disabled')
         
-
-
+        #Display menu 
         self.main_window.config(menu = menubar)
 
         # space above
