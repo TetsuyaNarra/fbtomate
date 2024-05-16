@@ -385,7 +385,7 @@ if __name__ == "__main__" :
     #Title bar text
     main_window.title("FBtomate")
     #Title bar icon
-    img = ImageTk.PhotoImage(file='logo-removebg.png')
+    img = ImageTk.PhotoImage(file='logo_48.png')
     main_window.iconphoto(True, img)
     #main window size
     main_window.geometry("372x580+20+20")#372x580
