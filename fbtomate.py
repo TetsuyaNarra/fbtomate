@@ -1,3 +1,5 @@
+import os
+import signal
 from PIL import ImageTk
 import time
 import pyautogui
@@ -77,9 +79,9 @@ class fbToMate():
         #Manually stops chromedriver
         def chromeStop():
             try:
-                statusUpdate("Please wait while we are terminating session.", "yellow", 3000, "Montserrat 10")
+                statusUpdate("Please wait while we are terminating session.", "black", 3000, "Montserrat 10")
                 driver.quit()
-                
+                os.kill(os.getpid(), signal.SIGINT)
                 #driver.service.is_connectable()
                 print("Process terminated successfuly")
                 Browser_stop.configure(bg="#FFFFFF", fg="#FFFFFF", border=0, text="", state="disabled")
@@ -93,8 +95,8 @@ class fbToMate():
                 post_txt_box.configure(state="normal", bg="#B0BEC5")
                 print("Session has ended successfuly")
 
-
-        def checkElement():
+        #function to look for post element
+        def checkPostElement():
             try:
                 createPost = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div/div[2]/div/div/div[4]/div/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[1]/div")
                 print("Create post found")
@@ -112,8 +114,29 @@ class fbToMate():
                 except NoSuchElementException:
                     print("element not found") 
                     print("Moving to next ID...")
-                    
 
+        def textPostActions():
+            driver.implicitly_wait(3)
+            #prints if createPost element clicked
+            print("Create post executed")
+            #store message to path
+            Write = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div/div/div/div[2]/div/div/div")
+            #click to write
+            Write.click()
+            print("Writing...")
+            driver.implicitly_wait(3)
+            pyautogui.write(post_txt_box.get("1.0", END))
+            driver.implicitly_wait(3)
+            print("Post writing was completed")
+            self.main_window.update()
+            driver.implicitly_wait(3)
+            button = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[3]/div/div")
+            button.click()
+
+        def imagePostElement():
+            pass
+
+        
         def changeOnHoverBg(button, colorOnHover, colorOnLeave):
 
             # adjusting background of the widget
@@ -137,7 +160,7 @@ class fbToMate():
 
             
         def loop_thread():
-            minOnStart()
+            #minOnStart()
             empty_list = []
             from_group_id = group_txt_box.get("1.0", END)
             empty_list = from_group_id.split(",")
@@ -151,25 +174,10 @@ class fbToMate():
                         driver.get('https://www.facebook.com/groups/%s' % (empty_list[i]))
                         print("Facebook executed")
                         driver.implicitly_wait(5)
-                        #post find post element
-                        checkElement()
-                        
-                        driver.implicitly_wait(3)
-                        #prints if createPost element clicked
-                        print("Create post executed")
-                        #store message to path
-                        Write = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div/div/div/div[2]/div/div/div")
-                        #click to write
-                        Write.click()
-                        print("Writing...")
-                        driver.implicitly_wait(3)
-                        pyautogui.typewrite(post_txt_box.get("1.0", END))
-                        driver.implicitly_wait(3)
-                        print("Post writing was completed")
-                        self.main_window.update()
-                        driver.implicitly_wait(3)
-                        button = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[3]/div/div")
-                        button.click()
+                        #check and find post element
+                        checkPostElement()
+                        #Initiate posting contents to groups
+                        textPostActions()
                         driver.implicitly_wait(5)
                         print("post was done in " + (empty_list[i]))
                         self.main_window.update()
@@ -191,14 +199,14 @@ class fbToMate():
                     except Exception:
                         try:
                             print("Post unsuccessful in " + (empty_list[i]))
-                            self.main_window.update()
                             status.configure(text="%d/%d completed" % (i - 1, len(empty_list)))
-                            
+                            self.main_window.update()
                             time.sleep(5)
                         
                             i += 1
                         except Exception:
                             i -= 1
+                            self.main_window.update()
                             messagebox.showinfo("DONE","%d/%d completed successfuly" % (i - 1, len(empty_list)))
                             status.configure(text="%d/%d completed successfuly" % (i - 1, len(empty_list)))
                             EndofSession()
@@ -206,15 +214,13 @@ class fbToMate():
 
 
         def checkDriverIfRunning():
-            try:
-                while driver._check_if_window_handle_is_current:
-                    try:
-                        statusUpdate("Driver is running...","green", 5000, "montserrat 10")
-                    except:
-                        Browser_stop.config(state="disabled")
-                        break
-            except: 
-                print("Driver is not running...")
+            while driver._check_if_window_handle_is_current:
+                try:
+                    statusUpdate("Driver is running...","green", 5000, "montserrat 10")
+                    continue
+                except:
+                    Browser_stop.config(state="disabled")
+                    break
                 
         def thread_main():
             try:
@@ -241,10 +247,11 @@ class fbToMate():
                 statusUpdate("Please start Google Chrome and login before starting session.", "red", 3000, "Montserrat 8")
 
             
-        def statusUpdate(displayText, foreground_color, duration, fontSize):
+        def statusUpdate(displayText={"Idle State"}, foreground_color=any, duration=None, fontSize=any):
             print(displayText)
             status.configure(text=displayText, fg=foreground_color, font=fontSize)
-            status.after(duration, clearStatus)
+            self.main_window.update()
+            #status.after(duration, clearStatus)
 
         def optionsPage():                
             settingsPage = Toplevel()
@@ -341,7 +348,7 @@ class fbToMate():
         post_txt_box.configure(border="1", bg="#B0BEC5")
         post_txt_box.grid(row=6, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
 
-        status = Label(self.main_window, fg="green", bg="#FFFFFF", font="montserrat 10 bold", text="")
+        status = Label(self.main_window, fg="green", bg="#FFFFFF", font="montserrat 10 bold", text="Waiting for session")
         status.grid(row=11, column=0, columnspan=2, ipadx=0, ipady=0, padx=5, pady=2, sticky=W)
 
         send_btn = Button(self.main_window, text="START", bg="#FFFFFF", fg="#212121", font="Montserrat 10 ", activebackground="white", command=thread_main)
@@ -369,7 +376,7 @@ class fbToMate():
         #checkDriverIfRunning()
 
 def minOnStart():
-    main_window.iconify()
+    main_window.withdraw()
 
 def manualQuit():
     try:
