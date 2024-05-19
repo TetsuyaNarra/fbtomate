@@ -247,7 +247,7 @@ class fbToMate():
                 statusUpdate("Please start Google Chrome and login before starting session.", "red", 3000, "Montserrat 8")
 
             
-        def statusUpdate(displayText={"Idle State"}, foreground_color=any, duration=None, fontSize=any):
+        def statusUpdate(displayText, foreground_color=any, duration=None, fontSize=any):
             print(displayText)
             status.configure(text=displayText, fg=foreground_color, font=fontSize)
             self.main_window.update()
@@ -306,7 +306,7 @@ class fbToMate():
         # Adding options menu
         file = Menu(menubar, tearoff = 0) 
         menubar.add_cascade(label ='Options', menu = file) 
-        file.add_command(label="Preferences", command=optionsPage)
+        file.add_command(label="Preferences", command=optionsPage, state='disabled')
         file.add_command(label="Support", command=donothing , state='disabled')
         file.add_command(label="Report issue", command=donothing, state='disabled')
         file.add_command(label="Check for updates", command=donothing, state='disabled')
@@ -344,9 +344,19 @@ class fbToMate():
         post_lbl.grid(row=5, column=0, columnspan=2, ipadx=0, ipady=3, padx=5, pady=2, sticky=W)
 
         # MESSAGE TEXTBOX
-        post_txt_box = Text(self.main_window, height=10, width=26)
+        post_txt_box = Text(self.main_window, height=5, width=26)
         post_txt_box.configure(border="1", bg="#B0BEC5")
         post_txt_box.grid(row=6, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
+
+        # Add media button
+        addImages = Button(self.main_window, text="Add media (optional)", bg="#FFFFFF", fg="#212121", font="Montserrat 8", activebackground="#B0BEC5", relief='ridge', command=open_ids)
+        addImages.configure(border="1")
+        addImages.grid(row=7, column=0, columnspan=2, ipadx=30, ipady=0, padx=5, pady=2, sticky=W)
+
+        # Media paths TEXTBOX
+        media_txt_box = Text(self.main_window, height=5, width=26)
+        media_txt_box.configure(border="1", bg="#B0BEC5")
+        media_txt_box.grid(row=8, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
 
         status = Label(self.main_window, fg="green", bg="#FFFFFF", font="montserrat 10 bold", text="Waiting for session")
         status.grid(row=11, column=0, columnspan=2, ipadx=0, ipady=0, padx=5, pady=2, sticky=W)
@@ -395,7 +405,7 @@ if __name__ == "__main__" :
     img = ImageTk.PhotoImage(file='logo_48.png')
     main_window.iconphoto(True, img)
     #main window size
-    main_window.geometry("372x580+20+20")#372x580
+    main_window.geometry("372x620+20+20")#372x580
     #main window background color
     main_window.configure(bg="#FFFFFF")
     #Disable maximized button
