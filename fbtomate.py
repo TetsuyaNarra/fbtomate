@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import signal
 from PIL import ImageTk
 import time
@@ -21,31 +22,34 @@ class fbToMate():
         
         #group id list
         def open_ids():
-            try:
-                ids_text_file = filedialog.askopenfilename(initialdir="C:/Desktop/", title='', filetypes=(("Text Files", "*.txt"),))
+            ids_text_file = filedialog.askopenfilename(initialdir="C:/Desktop/", title='', filetypes=(("Text Files", "*.txt"),))
+            if ids_text_file != "":
                 text_file = open(ids_text_file, 'r')
                 text_inside = text_file.read()
-                if text_inside != '':
-                    group_txt_box.delete('1.0', END)
-                    group_txt_box.insert(END, text_inside)
-                    text_file.close()
-                else:
-                    statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
-            except FileNotFoundError:
+                group_txt_box.delete('1.0', END)
+                group_txt_box.insert(END, text_inside)
+                text_file.close()
+            else:
+                group_txt_box.delete('1.0', END)
                 statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
+                
+
+                
 
         #update status back to normal
         def clearStatus():
-            status.config(text="", fg='#ffffff')
+            status.config(text="Waiting for session...", fg='green')
 
         #clear the fields
         def clear():
             group = group_txt_box.get("1.0",'end-1c')
             msg = post_txt_box.get("1.0", 'end-1c')
-
-            if group or msg:
+            mediaTxt = media_txt_box.get("1.0", 'end-1c')
+            if group or msg or mediaTxt:
                 group_txt_box.delete('1.0', END)
                 post_txt_box.delete('1.0', END)
+                media_txt_box.delete('1.0', END)
+                media_txt_box.configure(height=0, width=0, border="0", bg="#ffffff", state='disabled')
                 statusUpdate("Fields has been cleared successfully!", "green", 3000, "Montserrat 10")
             else:
                 statusUpdate("No text inputs found!", "red", 3000, "Montserrat 10")
@@ -90,6 +94,7 @@ class fbToMate():
             except:
                 statusUpdate("There's no session yet!", "red", 3000, "Montserrat 10")
                 
+        #Prints message after session has been ended
         def EndofSession():
                 group_txt_box.configure(state="normal", bg="#B0BEC5")
                 post_txt_box.configure(state="normal", bg="#B0BEC5")
@@ -115,10 +120,8 @@ class fbToMate():
                     print("element not found") 
                     print("Moving to next ID...")
 
+        # finds element and post text to groups
         def textPostActions():
-            driver.implicitly_wait(3)
-            #prints if createPost element clicked
-            print("Create post executed")
             #store message to path
             Write = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div/div/div/div[2]/div/div/div")
             #click to write
@@ -130,12 +133,58 @@ class fbToMate():
             print("Post writing was completed")
             self.main_window.update()
             driver.implicitly_wait(3)
-            button = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[3]/div/div")
-            button.click()
+            #click the post button
+            postBtnElement()
 
-        def imagePostElement():
-            pass
+        #adding media function
+        def addImage():
+            openMedia = filedialog.askopenfilenames(initialdir="C:/Desktop/", title='Choose media', filetypes=(("Media", "*.png *.jpg *.mp4 *.mkv *.heic"),))
+            correctedPath = Path(str(openMedia))
+            if openMedia != "":
+                media_txt_box.configure(border="1", bg="#B0BEC5", height=5, width=26, state='normal')
+                media_txt_box.delete("1.0",'end-1c')
+                media_txt_box.insert(END, correctedPath)
+            else:
+                statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
 
+        #uploading media function
+        def uploadMedia():
+            pathMedia = media_txt_box.get('1.0', END)
+            print(pathMedia)
+            #finds image button to upload media
+            imgUploadBtn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[1]/div[2]/div[1]/div/span/div/div/div[1]/div/div/div[1]")
+            #clicks the button to upload media
+            imgUploadBtn.click()
+            #finds input box to post text with images
+            txtAboveImage = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div/div/div/div[2]/div/div/div/div")
+            #clicks the text field to add text from textbox 
+            txtAboveImage.click()
+            #writes texts from textbox to post 
+            pyautogui.write(post_txt_box.get("1.0", END))
+            #finds input field to upload photos and other media
+            dragDropBtn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/input")
+            #execute uploading media
+            dragDropBtn.send_keys('D:/Personal/Python/Fukemu updates/download.jpg')
+            #click the post button
+            time.sleep(2)
+            postBtnElement()
+            
+
+        def postingContentManager():
+            checkMedia = media_txt_box.get('1.0', 'end-1c')
+            if len(checkMedia) == 0:
+                #Initiate posting text contents to groups 
+                textPostActions()
+                print('text only')
+            else:
+                #Initiate posting images contents to groups 
+                uploadMedia()
+                
+
+        def postBtnElement():
+            button = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[3]/div/div")                                   
+            button.click()                         
+            print('post button was clicked')
         
         def changeOnHoverBg(button, colorOnHover, colorOnLeave):
 
@@ -160,7 +209,6 @@ class fbToMate():
 
             
         def loop_thread():
-            #minOnStart()
             empty_list = []
             from_group_id = group_txt_box.get("1.0", END)
             empty_list = from_group_id.split(",")
@@ -176,8 +224,9 @@ class fbToMate():
                         driver.implicitly_wait(5)
                         #check and find post element
                         checkPostElement()
-                        #Initiate posting contents to groups
-                        textPostActions()
+                        print('check element done')
+                        postingContentManager()
+                        print('check content done')
                         driver.implicitly_wait(5)
                         print("post was done in " + (empty_list[i]))
                         self.main_window.update()
@@ -247,11 +296,11 @@ class fbToMate():
                 statusUpdate("Please start Google Chrome and login before starting session.", "red", 3000, "Montserrat 8")
 
             
-        def statusUpdate(displayText, foreground_color=any, duration=None, fontSize=any):
+        def statusUpdate(displayText, foreground_color, duration, fontSize):
             print(displayText)
             status.configure(text=displayText, fg=foreground_color, font=fontSize)
             self.main_window.update()
-            #status.after(duration, clearStatus)
+            status.after(duration, clearStatus)
 
         def optionsPage():                
             settingsPage = Toplevel()
@@ -349,22 +398,25 @@ class fbToMate():
         post_txt_box.grid(row=6, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
 
         # Add media button
-        addImages = Button(self.main_window, text="Add media (optional)", bg="#FFFFFF", fg="#212121", font="Montserrat 8", activebackground="#B0BEC5", relief='ridge', command=open_ids)
+        addImages = Button(self.main_window, text="Add media (Optional)", bg="#FFFFFF", fg="#212121", font="Montserrat 8", activebackground="#B0BEC5", relief='ridge', command=addImage)
         addImages.configure(border="1")
         addImages.grid(row=7, column=0, columnspan=2, ipadx=30, ipady=0, padx=5, pady=2, sticky=W)
 
         # Media paths TEXTBOX
-        media_txt_box = Text(self.main_window, height=5, width=26)
-        media_txt_box.configure(border="1", bg="#B0BEC5")
+        media_txt_box = Text(self.main_window, height=0, width=0)
+        media_txt_box.configure(border="0", bg="#ffffff", state='disabled')
         media_txt_box.grid(row=8, column=0, columnspan=3, ipadx=75, ipady=0, padx=5, pady=2, sticky=W)
 
-        status = Label(self.main_window, fg="green", bg="#FFFFFF", font="montserrat 10 bold", text="Waiting for session")
+        #Status label   
+        status = Label(self.main_window, fg="green", bg="#FFFFFF", font="montserrat 10", text="Waiting for session...")
         status.grid(row=11, column=0, columnspan=2, ipadx=0, ipady=0, padx=5, pady=2, sticky=W)
 
+        #Start session button
         send_btn = Button(self.main_window, text="START", bg="#FFFFFF", fg="#212121", font="Montserrat 10 ", activebackground="white", command=thread_main)
         send_btn.configure(border="1")
         send_btn.grid(row=10, column=0, columnspan=1, ipadx=30, ipady=0, padx=5, pady=5, sticky=W)
 
+        #clear input fields
         clear_btn = Button(self.main_window, text="CLEAR", bg="#FFFFFF", fg="#212121", font="Montserrat 10 ",
                         activebackground="white", command=clear)
         clear_btn.configure(border="1")
@@ -381,6 +433,7 @@ class fbToMate():
         changeOnHoverBg(read_txt, "#dcdcde", "#FFFFFF")
         changeOnHoverBg(clear_btn, "#dcdcde", "#FFFFFF")
         changeOnHoverBg(send_btn, "#dcdcde", "#FFFFFF")
+
 
         #checking if driver is running to disable stop button if false
         #checkDriverIfRunning()
