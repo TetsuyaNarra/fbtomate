@@ -138,19 +138,18 @@ class fbToMate():
 
         #adding media function
         def addImage():
+            global mediaList
             openMedia = filedialog.askopenfilenames(initialdir="C:/Desktop/", title='Choose media', filetypes=(("Media", "*.png *.jpg *.mp4 *.mkv *.heic"),))
-            correctedPath = Path(str(openMedia))
+            mediaList = list(openMedia)
             if openMedia != "":
                 media_txt_box.configure(border="1", bg="#B0BEC5", height=5, width=26, state='normal')
                 media_txt_box.delete("1.0",'end-1c')
-                media_txt_box.insert(END, correctedPath)
+                media_txt_box.insert(END, mediaList)
             else:
                 statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
 
         #uploading media function
         def uploadMedia():
-            pathMedia = media_txt_box.get('1.0', END)
-            print(pathMedia)
             #finds image button to upload media
             imgUploadBtn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[1]/div[2]/div[1]/div/span/div/div/div[1]/div/div/div[1]")
             #clicks the button to upload media
@@ -164,10 +163,15 @@ class fbToMate():
             #finds input field to upload photos and other media
             dragDropBtn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/input")
             #execute uploading media
-            dragDropBtn.send_keys('D:/Personal/Python/Fukemu updates/download.jpg')
-            #click the post button
-            time.sleep(2)
-            postBtnElement()
+            try:
+                for i in mediaList:
+                    dragDropBtn.send_keys(i)#'D:/Personal/Python/Fukemu updates/download.jpg')
+                    newDragBtn = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/div/div[2]/div/div[2]/input')
+                    newDragBtn.send_keys(mediaList[1:])
+            except:
+                #click the post button
+                time.sleep(2)
+                postBtnElement()
             
 
         def postingContentManager():
