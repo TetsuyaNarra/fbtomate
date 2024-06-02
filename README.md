@@ -6,7 +6,7 @@ FBtomate is a program to automate posting in Facebook groups using python with t
 
 # Windows 10 installer
 
-[Windows 10 installer x64](https://mega.nz/file/INIExDzR#7pfg3arrhdkyFDfReUhp1jutQk69kNtYAkcBEiWgifI)
+[Windows 10 installer x64](https://bit.ly/45ewe0H)
 
 # Donate
 
