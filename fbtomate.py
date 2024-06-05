@@ -163,15 +163,19 @@ class fbToMate():
             #finds input field to upload photos and other media
             dragDropBtn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/input")
             #execute uploading media
-            try:
-                for i in mediaList:
-                    dragDropBtn.send_keys(i)#'D:/Personal/Python/Fukemu updates/download.jpg')
+            try: 
+                dragDropBtn.send_keys(mediaList[0])#'D:/Personal/Python/Fukemu updates/download.jpg')
+                for im in mediaList[1:]:
                     newDragBtn = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/div/div[2]/div/div[2]/input')
-                    newDragBtn.send_keys(mediaList[1:])
+                    newDragBtn.send_keys(im)
             except:
                 #click the post button
-                time.sleep(2)
                 postBtnElement()
+                print('Post button clicked in inside')
+            finally:
+                #click the post button
+                postBtnElement()
+                print('Post button clicked in finally')
             
 
         def postingContentManager():
@@ -184,11 +188,14 @@ class fbToMate():
                 #Initiate posting images contents to groups 
                 uploadMedia()
                 
-
         def postBtnElement():
+            numOfMedia = len(mediaList)
+            roundUp = numOfMedia * 3
             button = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div[4]/div/div/div[1]/div/div[2]/div/div/div/div/div[1]/form/div/div[1]/div/div/div[1]/div/div[3]/div[3]/div/div")                                   
             button.click()                         
             print('post button was clicked')
+            #print(roundUp)
+            time.sleep(roundUp)
         
         def changeOnHoverBg(button, colorOnHover, colorOnLeave):
 
