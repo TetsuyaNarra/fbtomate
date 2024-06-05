@@ -145,7 +145,11 @@ class fbToMate():
                 media_txt_box.configure(border="1", bg="#B0BEC5", height=5, width=26, state='normal')
                 media_txt_box.delete("1.0",'end-1c')
                 media_txt_box.insert(END, mediaList)
+                if len(mediaList) >= 2:
+                    messagebox.showwarning('Slow upload waring', 'Adding/uploading more than 2 media or high resolution media may affect your time uploading in session')
             else:
+                media_txt_box.delete("1.0",'end-1c')
+                media_txt_box.configure(border="0", bg="#ffffff", height=0, width=0, state='disabled')
                 statusUpdate("No such file or Directory exist!", "red", 3000, "montserrat 10")
 
         #uploading media function
